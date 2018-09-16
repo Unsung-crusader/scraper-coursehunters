@@ -1,32 +1,33 @@
-const Nightmare = require('nightmare');
 const fs = require('fs');
+const puppeteer = require('puppeteer');
 
-const nightmare = Nightmare({ show: true });
-const file = fs.createWriteStream('./rename.txt');
+const url = 'https://coursehunters.net/course/yazyk-programmirovaniya-rust';
 
-//make the goto Url more dynamic
-nightmare
-  .goto('https://coursehunters.net/course/yazyk-programmirovaniya-rust')
-  .evaluate(() => {
-    //converting HTMLCollection into an array
-    const lessonListElements = [
-      ...document.getElementsByClassName('lessons-list__progress'),
-    ];
-    let lessonLists = [];
-    lessonListElements.forEach(el =>
-      lessonLists.push(el.nextElementSibling.innerHTML.split('Урок').join(''))
-    );
-    return lessonLists;
-  })
-  .end()
-  .then(lessonLists =>
-    lessonLists.map(lessonList => {
-      if (lessonList.includes('&amp;')) lessonList = lessonList.replace('&amp;', '&');
+(async () => {
+  const file = fs.createWriteStream('./rename.txt');
+  const browser = await puppeteer.launch();
+  const page = await browser.newPage();
 
-      return file.write(`${lessonList}.mp4` + '\n');
-    })
-  )
+  //TODO: make url dynamic.
+  await page.goto(url);
 
-  .catch(error => {
-    console.error('Search failed:', error);
+  const lessonTitles = await page.evaluate(() => {
+    const lessonTitleNodes = [...document.getElementsByClassName('lessons-list__progress')];
+    const lessonTitles = [];
+
+    lessonTitleNodes.forEach(el => {
+      const title = el.nextElementSibling.innerHTML;
+      lessonTitles.push(title.split('Урок').join(''));
+    });
+
+    return lessonTitles;
   });
+
+  lessonTitles.map(lessonTitle => {
+    if (lessonTitle.includes('&amp;')) lessonTitle = lessonTitle.replace('&amp;', '&');
+
+    return file.write(`${lessonTitle}.mp4` + '\n');
+  });
+
+  await browser.close();
+})();
