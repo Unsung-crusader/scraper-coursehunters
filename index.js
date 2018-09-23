@@ -2,10 +2,8 @@ const fs = require('fs');
 const puppeteer = require('puppeteer');
 const readline = require('readline');
 
-scrapeTitle();
-
-async function scrapeTitle() {
-  const url = await getUrlFromConsole();
+(async function scrapeTitle() {
+  const url = await inputUrl();
   const file = fs.createWriteStream('./lessons_titles.txt');
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
@@ -22,9 +20,9 @@ async function scrapeTitle() {
 
   console.log('DONE! TITLES COPIED INTO lessons_titles.txt');
   await browser.close();
-}
+})();
 
-function getUrlFromConsole() {
+function inputUrl() {
   const reader = readline.createInterface(process.stdin, process.stdout, null);
 
   return new Promise((resolve, reject) => {
