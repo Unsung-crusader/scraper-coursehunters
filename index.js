@@ -1,6 +1,8 @@
 const fs = require('fs');
-const puppeteer = require('puppeteer');
 const readline = require('readline');
+const puppeteer = require('puppeteer');
+
+const renameVideos = require('./renameLessons');
 
 (async function scrapeTitle() {
   const url = await inputUrl();
@@ -21,6 +23,8 @@ const readline = require('readline');
   console.log('DONE! TITLES COPIED INTO lessons_titles.txt');
   await browser.close();
 })();
+
+renameVideos();
 
 function inputUrl() {
   const reader = readline.createInterface(process.stdin, process.stdout, null);
