@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
 
-export default function renameVideos() {
+module.exports = function renameVideos() {
   const lessonTitles = fs
     .readFileSync('lessons_titles.txt', 'utf-8')
     .split(/\r?\n/)
